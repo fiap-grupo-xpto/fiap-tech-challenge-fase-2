@@ -12,3 +12,4 @@ aiofiles
 scikit-learn
 seaborn
 shap
+nbconvert

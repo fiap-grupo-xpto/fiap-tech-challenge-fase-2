@@ -1,5 +1,5 @@
 
-PDF_NOTEBOOK = train_model/tech_challenge_tuberculose.ipynb
+PDF_NOTEBOOK = train_model/analise_cancer.ipynb
 OUT_BASE = $(basename $(notdir $(PDF_NOTEBOOK)))
 # full path to the generated .tex (nbconvert writes into this dir)
 LATEX_DIR = ./pdf
