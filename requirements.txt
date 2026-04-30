@@ -1,0 +1,13 @@
+fastapi[standard]
+streamlit
+pandas
+gunicorn
+uvicorn
+kagglehub
+numpy==1.26.4
+scikit-learn
+matplotlib
+opencv-python
+aiofiles
+scikit-learn
+seaborn
