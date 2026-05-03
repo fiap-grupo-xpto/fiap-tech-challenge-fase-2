@@ -14,11 +14,11 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY requirements.txt ./api/
-WORKDIR /app/api
+COPY requirements.txt ./backend/
+WORKDIR /app/backend
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./api .
+COPY ./backend .
 
 EXPOSE 8888
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8888", "--workers", "1", "--log-level", "trace"]

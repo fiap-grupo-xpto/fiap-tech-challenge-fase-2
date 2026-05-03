@@ -76,11 +76,11 @@ PY
 	```
 3. Inicie a API:
 	```bash
-	uvicorn api.main:app --host 0.0.0.0 --port 8888 --reload
+	uvicorn backend.main:app --host 0.0.0.0 --port 8888 --reload
 	```
 4. Inicie a interface web:
 	```bash
-	streamlit run web/app.py
+	streamlit run frontend/app.py
 	```
 
 ## Rodando com Docker e Docker Compose

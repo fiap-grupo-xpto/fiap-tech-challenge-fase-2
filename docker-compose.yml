@@ -1,24 +1,24 @@
 services:
-  tech-challenge-api:
+  tech-challenge-backend:
     build:
-      dockerfile: ./api/Dockerfile
+      dockerfile: ./backend/Dockerfile
       context: ./
     ports:
       - "8888:8888"
     volumes:
-      - ./api:/app
+      - ./backend:/app
     environment:
       - PYTHONPATH=/app
 
-  tech-challenge-web:
+  tech-challenge-frontend:
     build:
-      dockerfile: ./web/Dockerfile
+      dockerfile: ./frontend/Dockerfile
       context: ./
     ports:
       - "8501:8501"
     volumes:
-      - ./web:/app
+      - ./frontend:/app
     environment:
-      - API_URL=http://tech-challenge-api:8888
+      - API_URL=http://tech-challenge-backend:8888
     depends_on:
-      - tech-challenge-api
+      - tech-challenge-backend
