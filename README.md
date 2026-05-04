@@ -13,7 +13,7 @@ Gustavo César de Souza - rm370800
 Thales Ernane de Souza - rm372083
 
 # Overview
-Este projeto tem o intuito de treinar modelos para análise de risco de cancer de pulmão através de dados demográficos de pacientes (dados tabulares csv) e detecção de cancer de pulmão através de imagens de exames raio-x (visão computacional).
+Este projeto tem o intuito de treinar modelos para análise de risco de cancer de pulmão através de dados demográficos de pacientes (dados tabulares csv) e detecção de cancer de pulmão através de imagens de ressonância (visão computacional).
 
 
 # Requisitos
@@ -30,7 +30,7 @@ Alternativamente, você pode abrir este notebook diretamente no [Google Colab](h
 Para treinar o modelo de visão computacional no Mac com processador silicon (M1, M2, M3, M4, etc) recomenda-se usar o conda e instalar o tensorflow-macos e tensorflow-metal habilitando assim o uso de gpu.
 ```bash
 brew install --cask miniforge 
-conta init zsh # ou bash se não estiver usando zsh
+conda init zsh # ou bash se não estiver usando zsh
 conda create -p ./.fiap-tf python=3.9
 conda activate ./.fiap-tf
 python -m pip install --upgrade pip setuptools wheel
@@ -56,6 +56,11 @@ _ = c.numpy()
 print("Matmul time (s):", time.time() - t0)
 PY
 ```
+## Treinamento do Modelo de Imagem
+
+Para o modelo de visão computacional, utilize o notebook `train_model/analise_cancer_imagem.ipynb`.
+
+Este notebook realiza o treinamento de um classificador de imagens com `TensorFlow/Keras` a partir do dataset [IQ-OTH/NCCD](https://data.mendeley.com/datasets/bhmdr45bh2/4), incluindo preparação dos dados, aumento de imagens, ajuste de limiar e exportação do melhor modelo.
 
 
 # Como rodar o projeto
