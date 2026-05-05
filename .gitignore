@@ -209,3 +209,9 @@ __marimo__/
 pdf/**
 !pdf/.gitkeep
 
+train_model/datasets/extracted/*
+!train_model/datasets/extracted/.gitkeep
+backend/model/*
+!backend/model/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep

@@ -2,7 +2,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, UploadFile, File, Form
 from typing import List
 from pathlib import Path
+import re
+import joblib
 import numpy as np
+import pandas as pd
 import aiofiles
 from tensorflow import keras
 import tensorflow as tf
@@ -11,22 +14,156 @@ import tensorflow as tf
 UPLOAD_DIR = Path(__file__).parent / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 IMG_SIZE = (224,224)
+TABULAR_MODEL_PATH = Path(__file__).parent / "model" / "lung_cancer_classifier.joblib"
 
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff'}
 
 
+def preprocess_image_for_model(file_path: Path, model) -> np.ndarray:
+    """Load an uploaded image and adapt its channels to the model input."""
+    img_data = tf.io.read_file(str(file_path))
+
+    input_shape = getattr(model, "input_shape", None)
+    expected_channels = None
+    if input_shape and len(input_shape) >= 4:
+        expected_channels = input_shape[-1]
+
+    if expected_channels == 1:
+        img = tf.image.decode_image(img_data, channels=1, expand_animations=False)
+    else:
+        img = tf.image.decode_image(img_data, channels=3, expand_animations=False)
+
+    img = tf.image.resize(img, IMG_SIZE)
+    img = tf.cast(img, tf.float32) / 255.0
+
+    if expected_channels == 1 and img.shape[-1] == 3:
+        img = tf.image.rgb_to_grayscale(img)
+    elif expected_channels not in (None, 1, 3):
+        raise ValueError(f"Unsupported model input channels: {expected_channels}")
+
+    image_array = np.expand_dims(img.numpy(), axis=0)
+    return image_array
+
+
+def normalize_column_name(column_name: str) -> str:
+    normalized = re.sub(r"[^0-9A-Za-z]+", "_", str(column_name).strip().upper())
+    return normalized.strip("_")
+
+
+def normalize_dataframe_columns(df: pd.DataFrame) -> pd.DataFrame:
+    renamed_columns = {}
+    seen = set()
+
+    for column in df.columns:
+        normalized = normalize_column_name(column)
+        if normalized in seen:
+            raise ValueError(f"Duplicate normalized column name detected: {normalized}")
+        seen.add(normalized)
+        renamed_columns[column] = normalized
+
+    return df.rename(columns=renamed_columns)
+
+
+def align_dataframe_to_expected_columns(
+    df: pd.DataFrame,
+    expected_columns: List[str],
+) -> pd.DataFrame:
+    normalized_source_columns = {
+        normalize_column_name(column): column for column in df.columns
+    }
+
+    aligned_columns = {}
+    missing_columns = []
+
+    for expected_column in expected_columns:
+        normalized_expected = normalize_column_name(expected_column)
+        source_column = normalized_source_columns.get(normalized_expected)
+        if source_column is None:
+            missing_columns.append(expected_column)
+            continue
+        aligned_columns[source_column] = expected_column
+
+    if missing_columns:
+        raise ValueError(f"CSV missing required columns: {missing_columns}")
+
+    return df.rename(columns=aligned_columns)[expected_columns].copy()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load the ML model after the process has started to avoid pre-fork initialization issues
-    model_path = Path(__file__).parent / "model" / "mobileNetV2.keras"
+    model_path = Path(__file__).parent / "model" / "best.keras"
     app.state.model = keras.models.load_model(str(model_path))
+
+    if TABULAR_MODEL_PATH.exists():
+        app.state.tabular_artifact = joblib.load(str(TABULAR_MODEL_PATH))
+    else:
+        app.state.tabular_artifact = None
     yield
     # Clean up the ML model and release resources
     app.state.model = None
+    app.state.tabular_artifact = None
 
 
 app = FastAPI(debug=True, lifespan=lifespan)
+
+
+@app.post("/analyze-tabular")
+async def analyze_tabular(csv_file: UploadFile = File(...)):
+    artifact = getattr(app.state, "tabular_artifact", None)
+    if artifact is None:
+        if not TABULAR_MODEL_PATH.exists():
+            return {
+                "status": "error",
+                "message": f"Tabular model artifact not found at {TABULAR_MODEL_PATH}"
+            }
+
+        artifact = joblib.load(str(TABULAR_MODEL_PATH))
+        app.state.tabular_artifact = artifact
+
+    pipeline = artifact["pipeline"]
+    threshold = float(artifact.get("threshold", 0.5))
+
+    if Path(csv_file.filename).suffix.lower() != ".csv":
+        return {
+            "status": "error",
+            "message": "Invalid file type. Only .csv files are allowed"
+        }
+
+    try:
+        input_frame = pd.read_csv(csv_file.file)
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Could not read CSV file: {e}"
+        }
+
+    expected_columns = artifact.get("feature_columns", [])
+    try:
+        input_frame = align_dataframe_to_expected_columns(input_frame, expected_columns)
+    except ValueError as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+
+    probabilities = pipeline.predict_proba(input_frame)[:, 1]
+
+    results = []
+    for index, probability in enumerate(probabilities):
+        results.append({
+            "row_index": index,
+            "disease_detected": bool(probability >= threshold),
+            "probability": float(probability)
+        })
+
+    return {
+        "status": "success",
+        "model_name": artifact.get("model_name", "unknown"),
+        "threshold": threshold,
+        "results": results
+    }
 
 
 @app.post("/analyze-images")
@@ -53,19 +190,14 @@ async def analyze_images(files: List[UploadFile] = File(...), probability_thresh
                 await f.write(content)
 
             # Load image, preprocess and predict with the model
-            img_data = tf.io.read_file(str(file_path))
-            img = tf.image.decode_image(img_data, channels=3, expand_animations=False)
-            img = tf.image.resize(img, IMG_SIZE)
-            img = tf.cast(img, tf.float32) / 255.0
-            image_array = np.expand_dims(img.numpy(), axis=0)  # batch dimension
-
             model = getattr(app.state, "model", None)
             if model is None:
                 # Fallback: load on demand (e.g., if lifespan didn't run)
-                model_path = Path(__file__).parent / "model" / "mobileNetV2.keras"
+                model_path = Path(__file__).parent / "model" / "best.keras"
                 model = keras.models.load_model(str(model_path))
                 app.state.model = model
 
+            image_array = preprocess_image_for_model(file_path, model)
             prediction = model.predict(image_array)
             probability = float(prediction[0][0])
             has_disease = probability >= probability_threshold

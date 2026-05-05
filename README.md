@@ -18,15 +18,40 @@ Este projeto tem o intuito de treinar modelos para análise de risco de cancer d
 
 # Requisitos
 - Python 3.9+ (para rodar local)
-- Docker e Docker Compose (para rodar a aplicação que consome os modelos produtizados em containers)
+- Docker e Docker Compose (para rodar o jupyter notebook para treino do modelo e também a aplicação que consome os modelos produtizados em containers)
 
-# Treinando o Modelo
-Dataset utilizado: https://www.kaggle.com/datasets/akashnath29/lung-cancer-dataset/data
+# Treinando os Modelos
+
+## Treinamento do Modelo tabular
+
+Dataset utilizados: 
+https://www.kaggle.com/datasets/akashnath29/lung-cancer-dataset/data
 
 O modelo pode ser treinado localmente utilizando o notebook `train_model/analise_cancer.ipynb`.
 
 Alternativamente, você pode abrir este notebook diretamente no [Google Colab](https://colab.research.google.com/) para execução na nuvem, sem necessidade de configuração local.
 
+Se estiver usando o ambiente Docker em `train_model/Dockerfile`, o container preserva o diretório `train_model`, expõe `datasets` na raiz para manter os paths dos notebooks e já inclui `pandoc`, `xelatex`, `texlive-fonts-recommended`, `texlive-latex-extra` e `texlive-plain-generic` para suportar a exportação de notebooks para PDF pelo Jupyter/nbconvert.
+
+## Treinamento do Modelo de Imagem
+
+Para o modelo de visão computacional, utilize o notebook `train_model/analise_cancer_imagem.ipynb`.
+
+Este notebook realiza o treinamento de um classificador de imagens com `TensorFlow/Keras` a partir do dataset [IQ-OTH/NCCD](https://data.mendeley.com/datasets/bhmdr45bh2/4), incluindo preparação dos dados, aumento de imagens, ajuste de limiar e exportação do melhor modelo.
+
+Se você for versionar o dataset compactado `train_model/datasets/The IQ-OTHNCCD lung cancer dataset.zip`, use Git LFS:
+
+```bash
+brew install git-lfs
+git lfs install
+git lfs track "train_model/datasets/*.zip"
+git add .gitattributes
+git add train_model/datasets/The\ IQ-OTHNCCD\ lung\ cancer\ dataset.zip
+```
+
+Se o arquivo já tiver sido adicionado ao Git normal em algum commit anterior, é necessário removê-lo do histórico ou recriar o commit após migrar para LFS.
+
+### Treinamento do model de visão computacional no Mac com processador silicon
 Para treinar o modelo de visão computacional no Mac com processador silicon (M1, M2, M3, M4, etc) recomenda-se usar o conda e instalar o tensorflow-macos e tensorflow-metal habilitando assim o uso de gpu.
 ```bash
 brew install --cask miniforge 
@@ -56,14 +81,25 @@ _ = c.numpy()
 print("Matmul time (s):", time.time() - t0)
 PY
 ```
-## Treinamento do Modelo de Imagem
-
-Para o modelo de visão computacional, utilize o notebook `train_model/analise_cancer_imagem.ipynb`.
-
-Este notebook realiza o treinamento de um classificador de imagens com `TensorFlow/Keras` a partir do dataset [IQ-OTH/NCCD](https://data.mendeley.com/datasets/bhmdr45bh2/4), incluindo preparação dos dados, aumento de imagens, ajuste de limiar e exportação do melhor modelo.
 
 
-# Como rodar o projeto
+## Treinando com Docker
+Para treinar usando o ambiente containerizado, utilize o Dockerfile em `train_model/Dockerfile`.
+
+1. Construa a imagem a partir da raiz do projeto:
+   ```bash
+   docker build -f train_model/Dockerfile -t tech-challenge-train-model .
+   ```
+2. Execute o container expondo o Jupyter Lab:
+   ```bash
+   docker run --rm -p 8089:8888 tech-challenge-train-model
+   ```
+3. Acesse o Jupyter Lab em `http://localhost:8089` e abra o notebook `train_model/analise_cancer.ipynb` ou `train_model/analise_cancer_imagem.ipynb`.
+
+Observação: o build precisa usar o contexto da raiz do repositório, porque o Dockerfile copia `requirements.txt` e a pasta `train_model/` a partir desse nível.
+
+
+# Como rodar o projeto de exemplo usando o modelo produtizado
 ## Rodando localmente (sem Docker)
 1. Crie e ative um ambiente virtual com Python 3.10+:
 	```bash
@@ -98,6 +134,6 @@ Este notebook realiza o treinamento de um classificador de imagens com `TensorFl
 4. A aplicação web estará disponível em `http://localhost:8501`.
 
 # Notas
+- A interface web faz primeiro a pré-triagem por CSV e depois libera a segunda etapa para envio das imagens de ressonância.
 - Utilize o campo de upload da web para carregar múltiplas imagens de exames.
 - Caso queira limpar resultados, use o botão de limpar.
-

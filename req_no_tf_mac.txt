@@ -14,4 +14,3 @@ seaborn
 shap
 nbconvert
 tf-keras-vis
-tensorflow
