@@ -7,11 +7,13 @@ LATEX_FILE = $(LATEX_DIR)/$(OUT_BASE).tex
 PDF_FILE = $(LATEX_DIR)/$(OUT_BASE).pdf
 # base name (without dir or extension) used as jobname for xelatex
 LATEX_BASENAME = $(OUT_BASE)
+JUPYTER = .venv/bin/jupyter
+PYTHON = .venv/bin/python
 
 .PHONY: pdf
 pdf: $(LATEX_FILE)
 	@echo "Sanitizing LaTeX (remove fancyhdr/header lines)"
-	python3 tools/generate_pdf.py $(LATEX_FILE)
+	$(PYTHON) tools/generate_pdf.py $(LATEX_FILE)
 	@echo "Building PDF (xelatex x3)"
 	# run xelatex from the PDF directory so relative image paths (e.g. *_files/) resolve
 	(cd $(LATEX_DIR) && xelatex -interaction=nonstopmode -jobname="$(LATEX_BASENAME)" "$(LATEX_BASENAME).tex" >/dev/null || true)
@@ -22,4 +24,4 @@ pdf: $(LATEX_FILE)
 $(LATEX_FILE): $(PDF_NOTEBOOK)
 	@echo "Converting notebook to LaTeX"
 	# ensure output filename matches OUT_BASE
-	jupyter nbconvert --to latex --output "$(OUT_BASE)" --output-dir=./pdf $(PDF_NOTEBOOK)
+	$(JUPYTER) nbconvert --to latex --output "$(OUT_BASE)" --output-dir=./pdf $(PDF_NOTEBOOK)
