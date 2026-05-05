@@ -5,11 +5,10 @@ gunicorn
 uvicorn
 kagglehub
 numpy==1.26.4
-scikit-learn
+scikit-learn==1.6.1
 matplotlib
 opencv-python
 aiofiles
-scikit-learn
 seaborn
 shap
 nbconvert

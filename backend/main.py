@@ -90,20 +90,31 @@ def align_dataframe_to_expected_columns(
     return df.rename(columns=aligned_columns)[expected_columns].copy()
 
 
+def load_tabular_artifact(app: FastAPI):
+    """Load the tabular model artifact and cache the last load error, if any."""
+    if not TABULAR_MODEL_PATH.exists():
+        return None
+
+    try:
+        return joblib.load(str(TABULAR_MODEL_PATH))
+    except Exception as exc:
+        app.state.tabular_artifact_error = str(exc)
+        return None
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load the ML model after the process has started to avoid pre-fork initialization issues
     model_path = Path(__file__).parent / "model" / "best.keras"
     app.state.model = keras.models.load_model(str(model_path))
 
-    if TABULAR_MODEL_PATH.exists():
-        app.state.tabular_artifact = joblib.load(str(TABULAR_MODEL_PATH))
-    else:
-        app.state.tabular_artifact = None
+    app.state.tabular_artifact_error = None
+    app.state.tabular_artifact = load_tabular_artifact(app)
     yield
     # Clean up the ML model and release resources
     app.state.model = None
     app.state.tabular_artifact = None
+    app.state.tabular_artifact_error = None
 
 
 app = FastAPI(debug=True, lifespan=lifespan)
@@ -113,13 +124,34 @@ app = FastAPI(debug=True, lifespan=lifespan)
 async def analyze_tabular(csv_file: UploadFile = File(...)):
     artifact = getattr(app.state, "tabular_artifact", None)
     if artifact is None:
+        artifact_error = getattr(app.state, "tabular_artifact_error", None)
+        if artifact_error is not None:
+            return {
+                "status": "error",
+                "message": (
+                    "Could not load tabular model artifact. "
+                    "Rebuild the backend image with scikit-learn==1.6.1."
+                ),
+                "details": artifact_error,
+            }
+
         if not TABULAR_MODEL_PATH.exists():
             return {
                 "status": "error",
                 "message": f"Tabular model artifact not found at {TABULAR_MODEL_PATH}"
             }
 
-        artifact = joblib.load(str(TABULAR_MODEL_PATH))
+        artifact = load_tabular_artifact(app)
+        if artifact is None:
+            artifact_error = getattr(app.state, "tabular_artifact_error", None)
+            return {
+                "status": "error",
+                "message": (
+                    "Could not load tabular model artifact. "
+                    "Rebuild the backend image with scikit-learn==1.6.1."
+                ),
+                "details": artifact_error,
+            }
         app.state.tabular_artifact = artifact
 
     pipeline = artifact["pipeline"]
