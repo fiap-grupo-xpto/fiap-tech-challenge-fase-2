@@ -35,7 +35,7 @@ def preprocess_image_for_model(file_path: Path, model) -> np.ndarray:
         img = tf.image.decode_image(img_data, channels=3, expand_animations=False)
 
     img = tf.image.resize(img, IMG_SIZE)
-    img = tf.cast(img, tf.float32) / 255.0
+    img = tf.cast(img, tf.float32)
 
     if expected_channels == 1 and img.shape[-1] == 3:
         img = tf.image.rgb_to_grayscale(img)
@@ -200,14 +200,15 @@ async def analyze_images(files: List[UploadFile] = File(...), probability_thresh
             image_array = preprocess_image_for_model(file_path, model)
             prediction = model.predict(image_array)
             probability = float(prediction[0][0])
-            has_disease = probability >= probability_threshold
+            has_disease = probability >= float(probability_threshold)
 
             results.append({
                 "filename": file.filename,
                 "status": "success",
                 "file_path": str(file_path),
                 "disease_detected": has_disease,
-                "probability": probability
+                "probability": probability,
+                "threshold_used": float(probability_threshold),
             })
             
             

@@ -262,14 +262,15 @@ if st.session_state.stage == 2:
         go_to_stage(1)
 
     st.info(
-        "Defina no campo abaixo o limite de probabilidade para classificar uma imagem como positiva. Recomendado: 91%."
+        "O limite inicial vem do treino do modelo e pode ser ajustado manualmente se necessário."
     )
     probability_threshold = st.number_input(
         "",
-        min_value=0,
-        max_value=100,
-        value=91,
-        step=1,
+        min_value=0.0,
+        max_value=100.0,
+        value=10.0,
+        step=0.01,
+        format="%.2f",
         width=150,
         label_visibility="collapsed",
     )
@@ -332,6 +333,9 @@ if st.session_state.stage == 2:
                                     st.write(f"**Nome do arquivo:** {file.name}")
                                     st.write(f"**Tipo do arquivo:** {file.type}")
                                     st.write(f"**Tamanho do arquivo:** {file.size} bytes")
+                                    st.write(
+                                        f"**Limiar usado:** {float(r.get('threshold_used', probability_threshold / 100.0)) * 100:.2f}%"
+                                    )
                                     st.write(f"🔍 Achado suspeito: {'Sim' if r.get('disease_detected') else 'Não'}")
                                     st.write(f"📈 Probabilidade: {float(r.get('probability', 0)) * 100:.2f}%")
                                     if r.get("disease_detected"):
