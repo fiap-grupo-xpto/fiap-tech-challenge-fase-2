@@ -15,6 +15,16 @@ Thales Ernane de Souza - rm372083
 # Overview
 Este projeto tem o intuito de treinar modelos para análise de risco de cancer de pulmão através de dados demográficos de pacientes (dados tabulares csv) e detecção de cancer de pulmão através de imagens de ressonância (visão computacional).
 
+# Vídeo de demonstração: 
+
+[![(7) FIAP - Grupo 69 - Tech Challenge - Fase 1 - YouTube](https://i.ytimg.com/vi/-SdZHwdxZpI/hqdefault.jpg)](https://www.youtube.com/watch?v=-SdZHwdxZpI "(7) FIAP - Grupo 69 - Tech Challenge - Fase 1 - YouTube")
+
+
+# Relatórios PDF
+
+- [Relatório principal](fiap_tech_challenge_fase_1_analise_cancer_csv_grupo69.pdf)
+- [Relatório extra - visão computacional](fiap_tech_challenge_fase_1_extra_grupo69.pdf)
+
 
 # Requisitos
 - Python 3.9+ (para rodar local)
@@ -39,17 +49,6 @@ Para o modelo de visão computacional, utilize o notebook `train_model/analise_c
 
 Este notebook realiza o treinamento de um classificador de imagens com `TensorFlow/Keras` a partir do dataset [IQ-OTH/NCCD](https://data.mendeley.com/datasets/bhmdr45bh2/4), incluindo preparação dos dados, aumento de imagens, ajuste de limiar e exportação do melhor modelo.
 
-Se você for versionar o dataset compactado `train_model/datasets/The IQ-OTHNCCD lung cancer dataset.zip`, use Git LFS:
-
-```bash
-brew install git-lfs
-git lfs install
-git lfs track "train_model/datasets/*.zip"
-git add .gitattributes
-git add train_model/datasets/The\ IQ-OTHNCCD\ lung\ cancer\ dataset.zip
-```
-
-Se o arquivo já tiver sido adicionado ao Git normal em algum commit anterior, é necessário removê-lo do histórico ou recriar o commit após migrar para LFS.
 
 ### Treinamento do model de visão computacional no Mac com processador silicon
 Para treinar o modelo de visão computacional no Mac com processador silicon (M1, M2, M3, M4, etc) recomenda-se usar o conda e instalar o tensorflow-macos e tensorflow-metal habilitando assim o uso de gpu.
