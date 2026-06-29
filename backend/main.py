@@ -9,6 +9,7 @@ import pandas as pd
 import aiofiles
 from tensorflow import keras
 import tensorflow as tf
+from backend.llm.interpreter import generate_tabular_interpretation
 
 # Create uploads directory if it doesn't exist
 UPLOAD_DIR = Path(__file__).parent / "uploads"
@@ -183,17 +184,31 @@ async def analyze_tabular(csv_file: UploadFile = File(...)):
     probabilities = pipeline.predict_proba(input_frame)[:, 1]
 
     results = []
+    model_name = artifact.get("model_name", "unknown")
+
     for index, probability in enumerate(probabilities):
-        results.append({
+        result = {
             "row_index": index,
             "disease_detected": bool(probability >= threshold),
             "probability": float(probability)
-        })
+        }
+
+        if index < 5:
+            result["llm_interpretation"] = generate_tabular_interpretation(
+                result=result,
+                model_name=model_name,
+                threshold=threshold
+            )
+        else:
+            result["llm_interpretation"] = "Interpretação por LLM não gerada para este registro para evitar excesso de chamadas."
+
+        results.append(result)
 
     return {
         "status": "success",
-        "model_name": artifact.get("model_name", "unknown"),
+        "model_name": model_name,
         "threshold": threshold,
+        "interpretation_engine": "rule_based_llm_ready",
         "results": results
     }
 
