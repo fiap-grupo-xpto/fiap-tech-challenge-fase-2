@@ -10,12 +10,14 @@ import aiofiles
 from tensorflow import keras
 import tensorflow as tf
 from backend.llm.interpreter import generate_tabular_interpretation
+import os
 
 # Create uploads directory if it doesn't exist
 UPLOAD_DIR = Path(__file__).parent / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 IMG_SIZE = (224,224)
 TABULAR_MODEL_PATH = Path(__file__).parent / "model" / "lung_cancer_classifier.joblib"
+MAX_LLM_INTERPRETATIONS = int(os.getenv("MAX_LLM_INTERPRETATIONS", "5"))
 
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff'}
@@ -187,13 +189,23 @@ async def analyze_tabular(csv_file: UploadFile = File(...)):
     model_name = artifact.get("model_name", "unknown")
 
     for index, probability in enumerate(probabilities):
+        probability_float = float(probability)
+
+        if probability_float >= 0.7:
+            risk_level = "alto"
+        elif probability_float >= 0.4:
+            risk_level = "moderado"
+        else:
+            risk_level = "baixo"
+
         result = {
             "row_index": index,
-            "disease_detected": bool(probability >= threshold),
-            "probability": float(probability)
+            "disease_detected": bool(probability_float >= threshold),
+            "probability": probability_float,
+            "risk_level": risk_level
         }
 
-        if index < 5:
+        if index < MAX_LLM_INTERPRETATIONS:
             result["llm_interpretation"] = generate_tabular_interpretation(
                 result=result,
                 model_name=model_name,
@@ -208,7 +220,7 @@ async def analyze_tabular(csv_file: UploadFile = File(...)):
         "status": "success",
         "model_name": model_name,
         "threshold": threshold,
-        "interpretation_engine": "rule_based_llm_ready",
+        "interpretation_engine": "gemini-2.5-flash",
         "results": results
     }
 

@@ -22,7 +22,7 @@ def generate_tabular_interpretation(result: dict, model_name: str, threshold: fl
     prompt = f"""
 Você é uma LLM integrada a um sistema de apoio ao diagnóstico médico.
 
-Explique o resultado abaixo em linguagem natural, clara e responsável.
+Explique o resultado abaixo de forma clara, objetiva e responsável.
 
 Dados do modelo:
 - Modelo utilizado: {model_name}
@@ -31,12 +31,22 @@ Dados do modelo:
 - Doença detectada pelo modelo: {"sim" if disease_detected else "não"}
 - Nível de risco estimado: {risk_level}
 
+Responda obrigatoriamente neste formato:
+
+Resumo:
+Risco:
+Justificativa:
+Recomendação:
+Observação:
+
 Regras:
 - Não diga que o paciente tem diagnóstico confirmado.
 - Não substitua avaliação médica.
 - Use linguagem adequada para profissionais da saúde.
-- Seja objetivo, em no máximo 5 frases.
-- Inclua uma ressalva de que o resultado é apoio à decisão clínica.
+- Seja objetivo.
+- A recomendação deve ser compatível com o nível de risco.
+- A observação deve deixar claro que o resultado é apoio à decisão clínica.
+- Não use markdown, negrito, asteriscos ou listas.
 """
 
     try:
