@@ -99,6 +99,14 @@ Observação: o build precisa usar o contexto da raiz do repositório, porque o 
 
 
 # Como rodar o projeto de exemplo usando o modelo produtizado
+
+## Configurando variáveis de ambiente
+A interpretação dos resultados via LLM (Gemini) precisa de uma chave de API. Copie o arquivo de exemplo e preencha `GEMINI_API_KEY` com sua chave:
+```bash
+cp .env.example .env
+```
+Esse `.env` é lido tanto na execução local (via `python-dotenv`) quanto pelo `docker-compose` (o serviço `tech-challenge-backend` carrega o arquivo através de `env_file`).
+
 ## Rodando localmente (sem Docker)
 1. Crie e ative um ambiente virtual com Python 3.10+:
 	```bash

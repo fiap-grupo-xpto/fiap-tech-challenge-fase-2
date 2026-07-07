@@ -9,7 +9,7 @@ import pandas as pd
 import aiofiles
 from tensorflow import keras
 import tensorflow as tf
-from backend.llm.interpreter import generate_tabular_interpretation
+from backend.llm.interpreter import generate_tabular_interpretation, generate_image_interpretation
 import os
 
 # Create uploads directory if it doesn't exist
@@ -18,6 +18,7 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 IMG_SIZE = (224,224)
 TABULAR_MODEL_PATH = Path(__file__).parent / "model" / "lung_cancer_classifier.joblib"
 MAX_LLM_INTERPRETATIONS = int(os.getenv("MAX_LLM_INTERPRETATIONS", "5"))
+IMAGE_MODEL_NAME = "Modelo de visão computacional (CNN - best.keras)"
 
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff'}
@@ -230,7 +231,7 @@ async def analyze_images(files: List[UploadFile] = File(...), probability_thresh
     results = []
     print(f"Received {len(files)} files for analysis with threshold {probability_threshold}")
     
-    for file in files:
+    for index, file in enumerate(files):
         # Check file extension
         file_ext = Path(file.filename).suffix.lower()
         if file_ext not in ALLOWED_EXTENSIONS:
@@ -261,16 +262,26 @@ async def analyze_images(files: List[UploadFile] = File(...), probability_thresh
             probability = float(prediction[0][0])
             has_disease = probability >= float(probability_threshold)
 
-            results.append({
+            image_result = {
                 "filename": file.filename,
                 "status": "success",
                 "file_path": str(file_path),
                 "disease_detected": has_disease,
                 "probability": probability,
                 "threshold_used": float(probability_threshold),
-            })
-            
-            
+            }
+
+            if index < MAX_LLM_INTERPRETATIONS:
+                image_result["llm_interpretation"] = generate_image_interpretation(
+                    result=image_result,
+                    model_name=IMAGE_MODEL_NAME,
+                    threshold=float(probability_threshold)
+                )
+            else:
+                image_result["llm_interpretation"] = "Interpretação por LLM não gerada para esta imagem para evitar excesso de chamadas."
+
+            results.append(image_result)
+
         except Exception as e:
             results.append({
                 "filename": file.filename,

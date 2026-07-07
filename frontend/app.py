@@ -149,10 +149,12 @@ if st.session_state.stage == 1:
                                 {True: "Positivo", False: "Negativo"}
                             )
                             display_df["Probabilidade (%)"] = (prediction_df["probability"] * 100).round(2)
+                            display_df["Interpretação da LLM"] = prediction_df["llm_interpretation"]
                         else:
                             display_df = prediction_df.copy()
                             display_df.insert(0, "Linha", display_df.index + 1)
                             display_df["Probabilidade (%)"] = (display_df["probability"] * 100).round(2)
+                            display_df["Interpretação da LLM"] = display_df["llm_interpretation"]
 
                         st.session_state.csv_results_display_df = display_df
                         st.session_state.csv_results_total_rows = len(prediction_df)
@@ -183,6 +185,23 @@ if st.session_state.stage == 1:
         else:
             st.success("✨ Nenhum caso suspeito foi identificado na triagem inicial.")
 
+        llm_column = "Interpretação da LLM"
+        if llm_column in display_df.columns:
+            interpreted_rows = display_df[
+                ~display_df[llm_column].fillna("").str.startswith("Interpretação por LLM não gerada")
+            ]
+            if not interpreted_rows.empty:
+                st.subheader("🩺 Interpretação da LLM")
+                st.caption(
+                    f"Explicações em linguagem natural geradas pela LLM para os {len(interpreted_rows)} "
+                    "primeiros casos analisados."
+                )
+                for _, row in interpreted_rows.iterrows():
+                    resultado = row.get("Resultado da triagem", "-")
+                    probabilidade = row.get("Probabilidade (%)", 0)
+                    with st.expander(f"Linha {int(row['Linha'])} — {resultado} ({probabilidade:.2f}%)"):
+                        st.text(row[llm_column])
+
         st.caption("Linhas marcadas em vermelho indicam casos suspeitos e devem ser priorizadas para revisão.")
 
         def highlight_positive_rows(row):
@@ -205,7 +224,7 @@ if st.session_state.stage == 1:
         )
         start_row = st.session_state.csv_page_index * st.session_state.csv_page_size
         end_row = min(start_row + st.session_state.csv_page_size, total_rows)
-        page_df = display_df.iloc[start_row:end_row].copy()
+        page_df = display_df.iloc[start_row:end_row].drop(columns=[llm_column], errors="ignore").copy()
 
         nav_prev, nav_info, nav_next = st.columns([0.55, 1.1, 2.35])
         with nav_prev:
@@ -342,6 +361,13 @@ if st.session_state.stage == 2:
                                         st.warning("⚠️ Recomendada avaliação médica detalhada")
                                     else:
                                         st.success("✨ Nenhuma anomalia detectada")
+
+                                    llm_interpretation = r.get("llm_interpretation", "")
+                                    if llm_interpretation and not llm_interpretation.startswith(
+                                        "Interpretação por LLM não gerada"
+                                    ):
+                                        with st.expander("🩺 Interpretação da LLM"):
+                                            st.text(llm_interpretation)
                                 else:
                                     st.write("❌ Status: Erro")
                                     st.write(f"Mensagem: {r.get('message')}")

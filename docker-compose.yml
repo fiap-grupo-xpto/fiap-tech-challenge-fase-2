@@ -9,6 +9,8 @@ services:
       - ./backend:/app
     environment:
       - PYTHONPATH=/app
+    env_file:
+      - .env
 
   tech-challenge-frontend:
     build:
