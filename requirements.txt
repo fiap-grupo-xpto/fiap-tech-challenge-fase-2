@@ -8,6 +8,7 @@ numpy==1.26.4
 scikit-learn==1.6.1
 matplotlib
 opencv-python
+pillow
 aiofiles
 seaborn
 shap
@@ -16,3 +17,4 @@ tf-keras-vis
 tensorflow
 python_dotenv
 google-genai
+pytest

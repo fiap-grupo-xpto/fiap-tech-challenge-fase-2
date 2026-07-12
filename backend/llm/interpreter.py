@@ -1,10 +1,31 @@
 import os
+import random
+import time
 from dotenv import load_dotenv
-from google import genai
+try:
+    from google import genai
+except ImportError:  # pragma: no cover - depends on optional runtime package
+    genai = None
 
 load_dotenv()
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")
+GEMINI_MAX_RETRIES = int(os.getenv("GEMINI_MAX_RETRIES", "3"))
+GEMINI_RETRY_BASE_DELAY = float(os.getenv("GEMINI_RETRY_BASE_DELAY", "1.5"))
+_client = None
+
+
+def get_client():
+    global _client
+    if _client is not None:
+        return _client
+
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key or genai is None:
+        return None
+
+    _client = genai.Client(api_key=api_key)
+    return _client
 
 def classify_risk(probability: float) -> str:
     if probability >= 0.7:
@@ -14,22 +35,58 @@ def classify_risk(probability: float) -> str:
     return "baixo"
 
 
+def _is_retryable_quota_error(exc: Exception) -> bool:
+    message = str(exc).lower()
+    retry_markers = (
+        "429",
+        "quota",
+        "resource_exhausted",
+        "rate limit",
+        "too many requests",
+    )
+    return any(marker in message for marker in retry_markers)
+
+
+def _fallback_message(model_name: str, probability: float, risk_level: str, details: str) -> str:
+    return (
+        f"O modelo {model_name} indicou uma probabilidade estimada de "
+        f"{probability * 100:.2f}%, classificada como risco {risk_level}. "
+        "Nao foi possivel gerar a interpretacao pela LLM neste momento. "
+        f"Detalhes tecnicos: {details}"
+    )
+
+
 def _generate_interpretation(prompt: str, model_name: str, probability: float, risk_level: str) -> str:
+    client = get_client()
+    if client is None:
+        return _fallback_message(
+            model_name,
+            probability,
+            risk_level,
+            "cliente Gemini indisponivel ou GEMINI_API_KEY nao configurada",
+        )
+
+    last_error = None
     try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
-        )
+        for attempt in range(GEMINI_MAX_RETRIES + 1):
+            try:
+                response = client.models.generate_content(
+                    model=GEMINI_MODEL_NAME,
+                    contents=prompt,
+                )
+                return response.text
+            except Exception as exc:  # pragma: no cover - depends on external API
+                last_error = exc
+                if attempt >= GEMINI_MAX_RETRIES or not _is_retryable_quota_error(exc):
+                    break
 
-        return response.text
+                jitter = random.uniform(0.0, 0.25)
+                delay = GEMINI_RETRY_BASE_DELAY * (2 ** attempt) + jitter
+                time.sleep(delay)
+    except Exception as exc:  # pragma: no cover - defensive
+        last_error = exc
 
-    except Exception as e:
-        return (
-            f"O modelo {model_name} indicou uma probabilidade estimada de "
-            f"{probability * 100:.2f}%, classificada como risco {risk_level}. "
-            "Não foi possível gerar a interpretação pela LLM neste momento. "
-            f"Detalhes técnicos: {str(e)}"
-        )
+    return _fallback_message(model_name, probability, risk_level, str(last_error))
 
 
 def generate_tabular_interpretation(result: dict, model_name: str, threshold: float) -> str:

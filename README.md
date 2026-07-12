@@ -25,6 +25,16 @@ Este projeto tem o intuito de treinar modelos para análise de risco de cancer d
 - [Relatório principal](fiap_tech_challenge_fase_1_analise_cancer_csv_grupo69.pdf)
 - [Relatório extra - visão computacional](fiap_tech_challenge_fase_1_extra_grupo69.pdf)
 
+# Relatório Técnico Consolidado
+
+O documento canônico da entrega técnica está em `RELATORIO_TECNICO_CONSOLIDADO.md`. Ele consolida:
+
+- lógica e estrutura do AG;
+- comparativo de performance original vs otimizado;
+- integração com LLMs, prompts, limitação de chamadas e tratamento de erros;
+- avaliação de qualidade das interpretações da LLM;
+- resultados tabulares e de imagem em um único relatório.
+
 
 # Requisitos
 - Python 3.9+ (para rodar local)
@@ -39,6 +49,24 @@ https://www.kaggle.com/datasets/akashnath29/lung-cancer-dataset/data
 
 O modelo pode ser treinado localmente utilizando o notebook `train_model/analise_cancer.ipynb`.
 
+Para a otimização de hiperparâmetros com Algoritmo Genético, use o script `train_model/genetic_optimizer.py`. Ele executa os 3 experimentos exigidos para `RandomForestClassifier`, `LogisticRegression`, `KNeighborsClassifier` e `ExtraTreesClassifier`, salva o ranking consolidado em `train_model/ga_optimization_results.json` e exporta o melhor artefato tabular para `backend/model/lung_cancer_classifier.joblib`.
+
+```bash
+python train_model/genetic_optimizer.py
+```
+
+## Treinamento do Modelo de Imagem com AG
+
+Para otimização genética do fluxo de visão computacional, utilize `train_model/genetic_optimizer_image.py`. Esse script aplica AG sobre hiperparâmetros da CNN baseada em `EfficientNetB0`, salva os resultados em `train_model/ga_image_optimization_results.json` e exporta o melhor modelo para `backend/model/best.keras`.
+
+Exemplo de execução em Python 3.11:
+
+```bash
+py -3.11 -m venv .venv311_img
+.\.venv311_img\Scripts\python -m pip install -r requirements.txt
+.\.venv311_img\Scripts\python train_model\genetic_optimizer_image.py
+```
+
 Alternativamente, você pode abrir este notebook diretamente no [Google Colab](https://colab.research.google.com/) para execução na nuvem, sem necessidade de configuração local.
 
 Se estiver usando o ambiente Docker em `train_model/Dockerfile`, o container preserva o diretório `train_model`, expõe `datasets` na raiz para manter os paths dos notebooks e já inclui `pandoc`, `xelatex`, `texlive-fonts-recommended`, `texlive-latex-extra` e `texlive-plain-generic` para suportar a exportação de notebooks para PDF pelo Jupyter/nbconvert.
@@ -48,6 +76,8 @@ Se estiver usando o ambiente Docker em `train_model/Dockerfile`, o container pre
 Para o modelo de visão computacional, utilize o notebook `train_model/analise_cancer_imagem.ipynb`.
 
 Este notebook realiza o treinamento de um classificador de imagens com `TensorFlow/Keras` a partir do dataset [IQ-OTH/NCCD](https://data.mendeley.com/datasets/bhmdr45bh2/4), incluindo preparação dos dados, aumento de imagens, ajuste de limiar e exportação do melhor modelo.
+
+O notebook continua como referência experimental, mas o caminho reprodutível com AG passou a ser `train_model/genetic_optimizer_image.py`.
 
 
 ### Treinamento do model de visão computacional no Mac com processador silicon
@@ -130,6 +160,18 @@ Esse `.env` é lido tanto na execução local (via `python-dotenv`) quanto pelo 
 	```bash
 	streamlit run frontend/app.py
 	```
+
+## Testes automatizados
+
+A suíte automatizada cobre o núcleo do AG e o endpoint tabular da API.
+
+```bash
+python -m pytest -q
+```
+
+## Resiliência da LLM
+
+O cliente Gemini em `backend/llm/interpreter.py` utiliza retry exponencial com jitter para falhas de quota/rate limit (`429`) e fallback textual quando a API não estiver disponível ou a chave não estiver configurada.
 
 ## Rodando com Docker e Docker Compose
 1. Certifique-se de que Docker e Docker Compose estejam instalados.
