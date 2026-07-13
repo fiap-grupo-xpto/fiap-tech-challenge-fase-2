@@ -1,5 +1,5 @@
 {
-  "dataset_path": "C:\\Users\\arfdd\\coding\\fiap-tech-challenge-fase-1\\train_model\\datasets\\dataset.csv",
+  "dataset_path": "/Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/train_model/datasets/dataset.csv",
   "experiments": [
     {
       "name": "exp1",
@@ -36,23 +36,23 @@
     "RandomForestClassifier": {
       "exp1": {
         "best_params": {
-          "n_estimators": 185,
-          "max_depth": 21,
+          "n_estimators": 56,
+          "max_depth": 17,
           "min_samples_split": 9,
-          "min_samples_leaf": 3,
-          "max_features": 0.687
+          "min_samples_leaf": 1,
+          "max_features": 0.8521
         },
-        "best_fitness": 0.5320030868387852,
+        "best_fitness": 0.538846579051951,
         "validation_metrics": {
-          "recall": 0.5427631578947368,
-          "specificity": 0.5337837837837838,
-          "f1": 0.5436573311367381,
-          "fairness_penalty": 0.01828606176432257
+          "recall": 0.5493421052631579,
+          "specificity": 0.5168918918918919,
+          "f1": 0.5439739413680782,
+          "fairness_penalty": 0.005863701515875341
         },
         "history": [
-          0.5307894282199057,
-          0.5320030868387852,
-          0.5320030868387852
+          0.5239075264040505,
+          0.5254315331663184,
+          0.538846579051951
         ],
         "config": {
           "pop_size": 8,
@@ -64,23 +64,23 @@
       },
       "exp2": {
         "best_params": {
-          "n_estimators": 163,
-          "max_depth": 27,
-          "min_samples_split": 2,
-          "min_samples_leaf": 1,
-          "max_features": 0.6585
+          "n_estimators": 238,
+          "max_depth": 28,
+          "min_samples_split": 6,
+          "min_samples_leaf": 3,
+          "max_features": 0.7242
         },
-        "best_fitness": 0.5371288970475068,
+        "best_fitness": 0.5349222046009945,
         "validation_metrics": {
-          "recall": 0.5394736842105263,
-          "specificity": 0.5574324324324325,
-          "f1": 0.5475792988313857,
-          "fairness_penalty": 0.015115319463145593
+          "recall": 0.5493421052631579,
+          "specificity": 0.5304054054054054,
+          "f1": 0.5475409836065573,
+          "fairness_penalty": 0.020544672718585733
         },
         "history": [
-          0.5276697472516072,
-          0.5276697472516072,
-          0.5371288970475068
+          0.5349222046009945,
+          0.5349222046009945,
+          0.5349222046009945
         ],
         "config": {
           "pop_size": 8,
@@ -92,23 +92,23 @@
       },
       "exp3": {
         "best_params": {
-          "n_estimators": 221,
-          "max_depth": 27,
-          "min_samples_split": 3,
-          "min_samples_leaf": 2,
-          "max_features": 0.8308
+          "n_estimators": 84,
+          "max_depth": 18,
+          "min_samples_split": 5,
+          "min_samples_leaf": 1,
+          "max_features": 0.709
         },
-        "best_fitness": 0.5550641876345416,
+        "best_fitness": 0.5352743679647103,
         "validation_metrics": {
-          "recall": 0.569078947368421,
-          "specificity": 0.5472972972972973,
-          "f1": 0.5662847790507365,
-          "fairness_penalty": 0.01819919211223553
+          "recall": 0.5592105263157895,
+          "specificity": 0.5135135135135135,
+          "f1": 0.5501618122977346,
+          "fairness_penalty": 0.025974025974025983
         },
         "history": [
-          0.5550641876345416,
-          0.5550641876345416,
-          0.5550641876345416
+          0.5275118669035811,
+          0.5348008807862303,
+          0.5352743679647103
         ],
         "config": {
           "pop_size": 12,
@@ -288,23 +288,23 @@
     "ExtraTreesClassifier": {
       "exp1": {
         "best_params": {
-          "n_estimators": 244,
-          "max_depth": 17,
-          "min_samples_split": 9,
-          "min_samples_leaf": 4,
-          "max_features": 0.8521
+          "n_estimators": 147,
+          "max_depth": 24,
+          "min_samples_split": 5,
+          "min_samples_leaf": 2,
+          "max_features": 0.8081
         },
-        "best_fitness": 0.4806330337955331,
+        "best_fitness": 0.4928593393124286,
         "validation_metrics": {
-          "recall": 0.46381578947368424,
-          "specificity": 0.5641891891891891,
-          "f1": 0.4912891986062718,
-          "fairness_penalty": 0.01750423489553926
+          "recall": 0.47368421052631576,
+          "specificity": 0.5675675675675675,
+          "f1": 0.5,
+          "fairness_penalty": 0.009729401033748863
         },
         "history": [
-          0.4806330337955331,
-          0.4806330337955331,
-          0.4806330337955331
+          0.4869988762170826,
+          0.4869988762170826,
+          0.4928593393124286
         ],
         "config": {
           "pop_size": 8,
@@ -316,23 +316,23 @@
       },
       "exp2": {
         "best_params": {
-          "n_estimators": 163,
-          "max_depth": 14,
-          "min_samples_split": 7,
-          "min_samples_leaf": 1,
-          "max_features": 0.9097
+          "n_estimators": 136,
+          "max_depth": 28,
+          "min_samples_split": 6,
+          "min_samples_leaf": 3,
+          "max_features": 0.7242
         },
-        "best_fitness": 0.5036369052183043,
+        "best_fitness": 0.4902086761681401,
         "validation_metrics": {
-          "recall": 0.4901315789473684,
-          "specificity": 0.543918918918919,
-          "f1": 0.5068027210884354,
-          "fairness_penalty": 0.001172740303175046
+          "recall": 0.4868421052631579,
+          "specificity": 0.5405405405405406,
+          "f1": 0.5034013605442177,
+          "fairness_penalty": 0.021369934413412672
         },
         "history": [
-          0.4793076309243358,
-          0.48007358824239243,
-          0.5036369052183043
+          0.4861499187242895,
+          0.4902086761681401,
+          0.4902086761681401
         ],
         "config": {
           "pop_size": 8,
@@ -345,22 +345,22 @@
       "exp3": {
         "best_params": {
           "n_estimators": 118,
-          "max_depth": 18,
-          "min_samples_split": 3,
-          "min_samples_leaf": 1,
-          "max_features": 0.9362
+          "max_depth": 21,
+          "min_samples_split": 7,
+          "min_samples_leaf": 4,
+          "max_features": 0.709
         },
-        "best_fitness": 0.5073301081775707,
+        "best_fitness": 0.4939907693761154,
         "validation_metrics": {
-          "recall": 0.5131578947368421,
-          "specificity": 0.5236486486486487,
-          "f1": 0.519134775374376,
-          "fairness_penalty": 0.01824262693827905
+          "recall": 0.48026315789473684,
+          "specificity": 0.5506756756756757,
+          "f1": 0.5008576329331046,
+          "fairness_penalty": 0.0089475741649655
         },
         "history": [
-          0.5003093601621227,
-          0.5073301081775707,
-          0.5073301081775707
+          0.48248275814237607,
+          0.4939907693761154,
+          0.4939907693761154
         ],
         "config": {
           "pop_size": 12,
@@ -374,18 +374,6 @@
   },
   "ranking": [
     {
-      "model_name": "RandomForestClassifier",
-      "best_experiment": "exp3",
-      "best_fitness": 0.5550641876345416,
-      "best_params": {
-        "n_estimators": 221,
-        "max_depth": 27,
-        "min_samples_split": 3,
-        "min_samples_leaf": 2,
-        "max_features": 0.8308
-      }
-    },
-    {
       "model_name": "KNeighborsClassifier",
       "best_experiment": "exp2",
       "best_fitness": 0.5456027761082889,
@@ -393,6 +381,18 @@
         "n_neighbors": 9,
         "weights": "uniform",
         "p": 2
+      }
+    },
+    {
+      "model_name": "RandomForestClassifier",
+      "best_experiment": "exp1",
+      "best_fitness": 0.538846579051951,
+      "best_params": {
+        "n_estimators": 56,
+        "max_depth": 17,
+        "min_samples_split": 9,
+        "min_samples_leaf": 1,
+        "max_features": 0.8521
       }
     },
     {
@@ -410,36 +410,34 @@
     {
       "model_name": "ExtraTreesClassifier",
       "best_experiment": "exp3",
-      "best_fitness": 0.5073301081775707,
+      "best_fitness": 0.4939907693761154,
       "best_params": {
         "n_estimators": 118,
-        "max_depth": 18,
-        "min_samples_split": 3,
-        "min_samples_leaf": 1,
-        "max_features": 0.9362
+        "max_depth": 21,
+        "min_samples_split": 7,
+        "min_samples_leaf": 4,
+        "max_features": 0.709
       }
     }
   ],
   "best_overall": {
-    "model_name": "RandomForestClassifier",
-    "best_experiment": "exp3",
-    "best_fitness": 0.5550641876345416,
+    "model_name": "KNeighborsClassifier",
+    "best_experiment": "exp2",
+    "best_fitness": 0.5456027761082889,
     "best_params": {
-      "n_estimators": 221,
-      "max_depth": 27,
-      "min_samples_split": 3,
-      "min_samples_leaf": 2,
-      "max_features": 0.8308
+      "n_neighbors": 9,
+      "weights": "uniform",
+      "p": 2
     },
     "export": {
-      "artifact_path": "C:\\Users\\arfdd\\coding\\fiap-tech-challenge-fase-1\\backend\\model\\lung_cancer_classifier.joblib",
-      "metadata_path": "C:\\Users\\arfdd\\coding\\fiap-tech-challenge-fase-1\\backend\\model\\lung_cancer_classifier.metadata.json",
+      "artifact_path": "/Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/backend/model/lung_cancer_classifier.joblib",
+      "metadata_path": "/Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/backend/model/lung_cancer_classifier.metadata.json",
       "threshold_summary": {
-        "threshold": 0.15,
-        "precision": 0.5075125208681135,
+        "threshold": 0.1,
+        "precision": 0.5066666666666667,
         "recall": 1.0,
-        "specificity": 0.0033783783783783786,
-        "f1": 0.6733111849390919
+        "specificity": 0.0,
+        "f1": 0.672566371681416
       },
       "test_metrics": {
         "accuracy": 0.505,
@@ -451,7 +449,7 @@
         "tn": 0,
         "fp": 297,
         "fn": 0,
-        "threshold": 0.15
+        "threshold": 0.1
       }
     }
   }

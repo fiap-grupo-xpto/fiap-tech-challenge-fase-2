@@ -494,29 +494,72 @@ Resultado validado:
 8 passed, 1 warning in 4.37s
 ```
 
-## 14. Como Reproduzir
+## 14. Desafios Enfrentados e Soluções
 
-### 14.1 Rodar o AG tabular
+Durante o desenvolvimento da Fase 2, a equipe enfrentou desafios técnicos e de engenharia críticos que exigiram soluções robustas:
+
+### 14.1 Estouro de Limites de Quota na API do Gemini (Resource Exhausted)
+* **Desafio:** A cota gratuita da API do Gemini (limites de requisições por minuto e por dia) causava o erro `429 RESOURCE_EXHAUSTED` com frequência durante as análises de lotes de pacientes do CSV ou imagens múltiplas.
+* **Solução:**
+  1. **Controle de Vazão (Rate Limiting):** A API restringe chamadas externas ao Gemini para no máximo as **5 primeiras linhas/imagens** de cada lote.
+  2. **Retry Exponencial com Jitter:** Implementação de uma política de retentativas automáticas no arquivo `backend/llm/interpreter.py` que aguarda de forma exponencial mais tempo com pequenas variações aleatórias de milissegundos (*jitter*) antes de re-tentar a chamada.
+  3. **Mecanismo de Fallback:** Se a cota persistir esgotada após 3 tentativas, o sistema retorna um payload contendo as métricas de probabilidade locais calculadas pelos nossos modelos de Machine Learning acompanhado de um disclaimer informando a indisponibilidade momentânea do tradutor automático.
+
+### 14.2 Discrepâncias de Dependências em Sistemas Operacionais Distintos
+* **Desafio:** Integrantes da equipe utilizando macOS (especialmente com chips Apple Silicon M1/M2/M3/M4) e Windows encontravam incompatibilidades na compilação do TensorFlow e do opencv, inviabilizando a execução homogênea do algoritmo genético de imagem (`genetic_optimizer_image.py`).
+* **Solução:**
+  1. **Isolamento de Ambientes virtuais Dedicados:** Criamos um ambiente virtual específico para o fluxo de visão computacional (`.venv`), com um arquivo de requerimentos (req_no_tf_mac.txt) e instruções de instalação apartado das dependências normais do backend tabular.
+  2. **Dockerização do Ambiente:** Uso de Dockerfiles específicos para rodar o pipeline de forma agnóstica a sistemas operacionais locais no backend e frontend.
+
+## 15. Arquitetura em Nuvem e Provisionamento (IaC)
+
+Para implantar a aplicação de forma automatizada e escalável na nuvem, desenvolvemos arquivos de configuração **Terraform (IaC)** localizados no diretório `/terraform`.
+
+### 15.1 Desenho da Arquitetura AWS
+A arquitetura de implantação foi estruturada sob o ecossistema da **Amazon Web Services (AWS)** utilizando contêineres Fargate (sem servidor):
+
+```
+                       [ Internet ]
+                            │
+                            ▼
+              [ Application Load Balancer ]
+                ┌───────────┴───────────┐
+                ▼                       ▼
+    [ Service: Streamlit ]    [ Service: FastAPI ]
+    (Fargate Task Frontend)   (Fargate Task Backend)
+                │                       │
+                └───────────┬───────────┘
+                            ▼
+                     [ Amazon ECS ]
+```
+
+* **VPC & Rede:** Subnets públicas e privadas com suporte a rotas e gateways NAT.
+* **Application Load Balancer (ALB):** Distribui o tráfego HTTP público direcionando-o para a interface Streamlit (porta 8501) ou a API FastAPI (porta 8888).
+* **Amazon ECS (Elastic Container Service) no AWS Fargate:** Roda as imagens Docker do backend e frontend de maneira isolada em tarefas serverless com autoescala horizontal por uso de CPU e memória.
+
+## 16. Como Reproduzir
+
+### 16.1 Rodar o AG tabular
 
 ```bash
 python train_model/genetic_optimizer.py
 ```
 
-### 14.2 Rodar o AG de imagem
+### 16.2 Rodar o AG de imagem
 
 ```bash
-py -3.11 -m venv .venv311_img
-.\.venv311_img\Scripts\python -m pip install -r requirements.txt
-.\.venv311_img\Scripts\python train_model\genetic_optimizer_image.py
+py -3.11 -m venv .venv
+.\.venv\bin\python -m pip install -r requirements.txt
+.\.venv\bin\python train_model\genetic_optimizer_image.py
 ```
 
-### 14.3 Rodar os testes
+### 16.3 Rodar os testes
 
 ```bash
 python -m pytest -q
 ```
 
-## 15. Proximos Passos Recomendados
+## 17. Proximos Passos Recomendados
 
 1. recalibrar o threshold produtivo do modelo tabular para reduzir falsos positivos;
 2. aumentar populacao e numero de geracoes do AG para melhor exploracao;
@@ -525,7 +568,7 @@ python -m pytest -q
 5. ampliar a avaliacao da LLM com amostra maior e menor dependencia da cota gratuita;
 6. versionar artefatos e experimentos com rastreabilidade por hash e data.
 
-## 16. Status Final
+## 18. Status Final
 
 - AG tabular: concluido
 - AG de imagem: concluido

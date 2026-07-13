@@ -20,20 +20,22 @@ Este projeto tem o intuito de treinar modelos para análise de risco de cancer d
 [![(7) FIAP - Grupo 69 - Tech Challenge - Fase 1 - YouTube](https://i.ytimg.com/vi/-SdZHwdxZpI/hqdefault.jpg)](https://www.youtube.com/watch?v=-SdZHwdxZpI "(7) FIAP - Grupo 69 - Tech Challenge - Fase 1 - YouTube")
 
 
-# Relatórios PDF
+# Relatórios PDF (Fase 1)
 
 - [Relatório principal](fiap_tech_challenge_fase_1_analise_cancer_csv_grupo69.pdf)
 - [Relatório extra - visão computacional](fiap_tech_challenge_fase_1_extra_grupo69.pdf)
 
-# Relatório Técnico Consolidado
+# Entregáveis da Fase 2
 
-O documento canônico da entrega técnica está em `RELATORIO_TECNICO_CONSOLIDADO.md`. Ele consolida:
+Os documentos canônicos da entrega técnica da Fase 2 foram estruturados e organizados no diretório [entregas/fase02/](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02):
 
-- lógica e estrutura do AG;
-- comparativo de performance original vs otimizado;
-- integração com LLMs, prompts, limitação de chamadas e tratamento de erros;
-- avaliação de qualidade das interpretações da LLM;
-- resultados tabulares e de imagem em um único relatório.
+- [Relatório Técnico Consolidado (Versão PDF)](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/RELATORIO_TECNICO_CONSOLIDADO.pdf) / [Versão Markdown](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/RELATORIO_TECNICO_CONSOLIDADO.md): Consolida a lógica/estrutura do AG, os desafios enfrentados, os comparativos de performance, a integração com LLMs, a infraestrutura em nuvem e a avaliação de qualidade das interpretações.
+- [Guia de Implantação na Nuvem (AWS)](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/COMO_SUBIR_NA_NUVEM.md): Tutorial passo a passo ensinando a buildar e subir as imagens Docker para o ECR, configurar as variáveis e implantar a infraestrutura usando Terraform.
+- [Provisionamento de Nuvem IaC (Terraform)](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/terraform): Diretório contendo os scripts Terraform (`main.tf`, `variables.tf`) para provisionamento automático de arquitetura resiliente na AWS (ECS, Fargate, ALB, VPC).
+- [Roteiro do Vídeo de Demonstração](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/roteiro_video_demonstracao.md): Script e orientações completas em português para gravação do vídeo técnico com até 15 minutos de duração.
+- [Documentação da API Estática](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/API_DOCS.md): Documento contendo a descrição das rotas, parâmetros, exemplos de payloads de sucesso e erro, e comandos curl de teste.
+- [Sumário Técnico da Otimização por AG](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/SUMARIO_TECNICO_GA.md): Detalha a formulação dos hiperparâmetros, operadores de seleção/cruzamento/mutação e a função fitness demográfica.
+- [Resultados Experimentais do AG](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/RESULTADOS_GA_OPTIMIZATION.md): Contém o ranking final de fitness e logs consolidados de desempenho tabular por experimento.
 
 
 # Requisitos
@@ -62,9 +64,9 @@ Para otimização genética do fluxo de visão computacional, utilize `train_mod
 Exemplo de execução em Python 3.11:
 
 ```bash
-py -3.11 -m venv .venv311_img
-.\.venv311_img\Scripts\python -m pip install -r requirements.txt
-.\.venv311_img\Scripts\python train_model\genetic_optimizer_image.py
+py -3.11 -m venv .venv
+.\.venv\bin\python -m pip install -r requirements.txt
+.\.venv\bin\python train_model\genetic_optimizer_image.py
 ```
 
 Alternativamente, você pode abrir este notebook diretamente no [Google Colab](https://colab.research.google.com/) para execução na nuvem, sem necessidade de configuração local.
