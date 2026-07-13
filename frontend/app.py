@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 import pandas as pd
+pd.set_option("mode.string_storage", "python")
 import requests
 import streamlit as st
 

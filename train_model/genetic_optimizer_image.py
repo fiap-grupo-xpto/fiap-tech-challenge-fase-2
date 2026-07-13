@@ -21,6 +21,7 @@ from zipfile import ZipFile
 
 import numpy as np
 import pandas as pd
+pd.set_option("mode.string_storage", "python")
 from sklearn.metrics import average_precision_score, confusion_matrix, roc_auc_score
 from sklearn.model_selection import train_test_split
 

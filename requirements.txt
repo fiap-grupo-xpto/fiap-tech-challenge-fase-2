@@ -18,3 +18,5 @@ tensorflow
 python_dotenv
 google-genai
 pytest
+pytest-asyncio
+watchdog

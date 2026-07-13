@@ -15,3 +15,4 @@ shap
 nbconvert
 tf-keras-vis
 pytest
+watchdog

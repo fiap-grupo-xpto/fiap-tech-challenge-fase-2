@@ -6,6 +6,7 @@ import re
 import joblib
 import numpy as np
 import pandas as pd
+pd.set_option("mode.string_storage", "python")
 import aiofiles
 from backend.llm.interpreter import generate_tabular_interpretation, generate_image_interpretation
 import os

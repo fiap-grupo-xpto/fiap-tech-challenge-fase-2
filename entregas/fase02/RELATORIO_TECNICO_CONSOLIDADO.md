@@ -511,6 +511,10 @@ Durante o desenvolvimento da Fase 2, a equipe enfrentou desafios técnicos e de 
   1. **Isolamento de Ambientes virtuais Dedicados:** Criamos um ambiente virtual específico para o fluxo de visão computacional (`.venv`), com um arquivo de requerimentos (req_no_tf_mac.txt) e instruções de instalação apartado das dependências normais do backend tabular.
   2. **Dockerização do Ambiente:** Uso de Dockerfiles específicos para rodar o pipeline de forma agnóstica a sistemas operacionais locais no backend e frontend.
 
+### 14.3 Suporte Dual a Provedores de LLM (Gemini Developer API vs Google Vertex AI)
+* **Desafio:** Em ambientes corporativos ou governamentais, o uso de chaves de API individuais (`GEMINI_API_KEY`) pode violar políticas de segurança ou governança de dados. Era necessário suportar credenciais integradas de nuvem via Vertex AI sem quebrar o código existente.
+* **Solução:** Refatoramos a inicialização do cliente no arquivo `backend/llm/interpreter.py` para detectar automaticamente a variável `USE_VERTEX_AI`. Quando ativada, a API consome o cliente do Google Cloud Vertex AI com autenticação baseada em Application Default Credentials (ADC) ou contas de serviço, mantendo a assinatura e os prompts idênticos.
+
 ## 15. Arquitetura em Nuvem e Provisionamento (IaC)
 
 Para implantar a aplicação de forma automatizada e escalável na nuvem, desenvolvemos arquivos de configuração **Terraform (IaC)** localizados no diretório `/terraform`.

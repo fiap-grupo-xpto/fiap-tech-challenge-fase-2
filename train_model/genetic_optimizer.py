@@ -19,6 +19,7 @@ from typing import Any, Dict, Iterable, List, Sequence, Tuple
 import joblib
 import numpy as np
 import pandas as pd
+pd.set_option("mode.string_storage", "python")
 from sklearn.base import BaseEstimator
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
@@ -105,8 +106,9 @@ def prepare_dataset(dataset_path: Path | str = DEFAULT_DATASET_PATH, seed: int =
         stratify=y_temp,
     )
 
-    categorical_columns = [column for column in X.columns if X[column].dtype == "object"]
-    numeric_columns = [column for column in X.columns if column not in categorical_columns]
+    from pandas.api.types import is_numeric_dtype
+    numeric_columns = [column for column in X.columns if is_numeric_dtype(X[column])]
+    categorical_columns = [column for column in X.columns if column not in numeric_columns]
     groups_val = X_val[DEMOGRAPHIC_COLUMN].astype(str).to_numpy() if DEMOGRAPHIC_COLUMN in X_val.columns else np.array(["all"] * len(X_val))
 
     return DatasetBundle(

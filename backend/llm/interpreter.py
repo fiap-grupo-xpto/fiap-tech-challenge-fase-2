@@ -13,19 +13,36 @@ GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")
 GEMINI_MAX_RETRIES = int(os.getenv("GEMINI_MAX_RETRIES", "3"))
 GEMINI_RETRY_BASE_DELAY = float(os.getenv("GEMINI_RETRY_BASE_DELAY", "1.5"))
 _client = None
+_client_error = None
 
 
-def get_client():
-    global _client
+def get_client_or_error():
+    global _client, _client_error
     if _client is not None:
-        return _client
+        return _client, None
+    if _client_error is not None:
+        return None, _client_error
 
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key or genai is None:
-        return None
+    if genai is None:
+        return None, "Biblioteca 'google-genai' nao instalada."
 
-    _client = genai.Client(api_key=api_key)
-    return _client
+    use_vertex = os.getenv("USE_VERTEX_AI", "false").lower() in ("true", "1", "yes")
+
+    try:
+        if use_vertex:
+            project = os.getenv("VERTEX_PROJECT")
+            location = os.getenv("VERTEX_LOCATION", "us-central1")
+            _client = genai.Client(vertexai=True, project=project, location=location)
+        else:
+            api_key = os.getenv("GEMINI_API_KEY")
+            if not api_key:
+                return None, "GEMINI_API_KEY nao configurada e USE_VERTEX_AI nao ativado"
+            _client = genai.Client(api_key=api_key)
+        return _client, None
+    except Exception as exc:
+        _client_error = str(exc)
+        return None, _client_error
+
 
 def classify_risk(probability: float) -> str:
     if probability >= 0.7:
@@ -57,13 +74,13 @@ def _fallback_message(model_name: str, probability: float, risk_level: str, deta
 
 
 def _generate_interpretation(prompt: str, model_name: str, probability: float, risk_level: str) -> str:
-    client = get_client()
+    client, error_details = get_client_or_error()
     if client is None:
         return _fallback_message(
             model_name,
             probability,
             risk_level,
-            "cliente Gemini indisponivel ou GEMINI_API_KEY nao configurada",
+            f"cliente LLM indisponivel. Detalhes: {error_details}",
         )
 
     last_error = None
