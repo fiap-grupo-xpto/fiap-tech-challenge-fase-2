@@ -34,68 +34,8 @@ Esta entrega cobre cinco frentes integradas:
 
 ## 3. Arquitetura Integrada
 
-```mermaid
-flowchart TB
-    subgraph TAB["Treinamento Tabular"]
-        A1[Dataset tabular CSV]
-        A2[genetic_optimizer.py]
-        A3[Split 60/20/20 + preprocessamento]
-        A4[AG em 4 modelos]
-        A5[Ranking e melhor configuracao]
-        A6[Export lung_cancer_classifier.joblib + metadata]
-        A1 --> A2 --> A3 --> A4 --> A5 --> A6
-    end
+![Arquitetura Integrada da Solução](architecture.png)
 
-    subgraph IMG["Treinamento de Imagem"]
-        B1[Dataset IQ-OTH NCCD]
-        B2[genetic_optimizer_image.py]
-        B3[Split treino validacao teste]
-        B4[AG para hiperparametros CNN]
-        B5[Melhor threshold + metricas]
-        B6[Export best.keras + metrics.json]
-        B1 --> B2 --> B3 --> B4 --> B5 --> B6
-    end
-
-    subgraph ART["Artefatos Produtivos"]
-        C1[backend/model]
-    end
-
-    subgraph API["Backend e Consumo"]
-        D1[backend/main.py]
-        D2[/analyze-tabular/]
-        D3[/analyze-images/]
-        D4[frontend/app.py]
-        D1 --> D2
-        D1 --> D3
-        D4 --> D1
-    end
-
-    subgraph LLM["Interpretacao por LLM"]
-        E1[backend/llm/interpreter.py]
-        E2[Prompts estruturados]
-        E3[Limite de chamadas]
-        E4[Retry 429 + fallback]
-        E1 --> E2
-        E1 --> E4
-    end
-
-    subgraph TEST["Validacao"]
-        F1[test_genetic_optimizer.py]
-        F2[test_genetic_optimizer_image.py]
-        F3[test_api.py]
-    end
-
-    A6 --> C1
-    B6 --> C1
-    C1 --> D1
-    D2 --> E1
-    D3 --> E1
-    E3 -. politica aplicada em .-> D2
-    E3 -. politica aplicada em .-> D3
-    F1 --> A2
-    F2 --> B2
-    F3 --> D1
-```
 
 ## 4. Logica e Estrutura do Algoritmo Genetico
 
@@ -266,12 +206,21 @@ Melhor modelo global:
 
 As metricas desta secao consolidam a comparacao entre os modelos em configuracao original e suas melhores configuracoes encontradas pelo AG. Os dados foram extraidos do fluxo comparativo documentado em `train_model/ag_analise_cancer.ipynb`.
 
-| Modelo | Original acc | AG acc | Delta acc | Original recall | AG recall | Delta recall | Original spec | AG spec | Delta spec | Original F1 | AG F1 | Delta F1 | Melhor exp |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| RandomForestClassifier | `0.5367` | `0.5483` | `+0.0116` | `0.5493` | `0.6086` | `+0.0592` | `0.5236` | `0.4865` | `-0.0372` | `0.5458` | `0.5772` | `+0.0315` | `exp3` |
-| LogisticRegression | `0.5200` | `0.5183` | `-0.0017` | `0.5822` | `0.5691` | `-0.0132` | `0.4561` | `0.4662` | `+0.0101` | `0.5514` | `0.5449` | `-0.0065` | `exp2` |
-| KNeighborsClassifier | `0.5050` | `0.5033` | `-0.0017` | `0.5164` | `0.5263` | `+0.0099` | `0.4932` | `0.4797` | `-0.0135` | `0.5139` | `0.5178` | `+0.0039` | `exp3` |
-| ExtraTreesClassifier | `0.5317` | `0.5233` | `-0.0083` | `0.5395` | `0.5362` | `-0.0033` | `0.5236` | `0.5101` | `-0.0135` | `0.5386` | `0.5327` | `-0.0059` | `exp3` |
+### Tabela 7.1: Métricas de Assertividade Geral (Acurácia e F1-Score)
+| Modelo | Acc (Orig) | Acc (AG) | Delta Acc | F1 (Orig) | F1 (AG) | Delta F1 |
+|---|---:|---:|---:|---:|---:|---:|
+| RandomForest | `0.5367` | `0.5483` | `+0.0116` | `0.5458` | `0.5772` | `+0.0315` |
+| LogisticReg | `0.5200` | `0.5183` | `-0.0017` | `0.5514` | `0.5449` | `-0.0065` |
+| KNeighbors | `0.5050` | `0.5033` | `-0.0017` | `0.5139` | `0.5178` | `+0.0039` |
+| ExtraTrees | `0.5317` | `0.5233` | `-0.0083` | `0.5386` | `0.5327` | `-0.0059` |
+
+### Tabela 7.2: Métricas Clínicas e de Otimização (Recall, Especificidade e Melhor Exp)
+| Modelo | Rec (Orig) | Rec (AG) | Delta Rec | Spec (Orig) | Spec (AG) | Delta Spec | Exp |
+|---|---:|---:|---:|---:|---:|---:|---|
+| RandomForest | `0.5493` | `0.6086` | `+0.0592` | `0.5236` | `0.4865` | `-0.0372` | `exp3` |
+| LogisticReg | `0.5822` | `0.5691` | `-0.0132` | `0.4561` | `0.4662` | `+0.0101` | `exp2` |
+| KNeighbors | `0.5164` | `0.5263` | `+0.0099` | `0.4932` | `0.4797` | `-0.0135` | `exp3` |
+| ExtraTrees | `0.5395` | `0.5362` | `-0.0033` | `0.5236` | `0.5101` | `-0.0135` | `exp3` |
 
 Leitura tecnica:
 
@@ -528,20 +477,8 @@ Para implantar a aplicação de forma automatizada e escalável na nuvem, desenv
 ### 15.1 Desenho da Arquitetura AWS
 A arquitetura de implantação foi estruturada sob o ecossistema da **Amazon Web Services (AWS)** utilizando contêineres Fargate (sem servidor):
 
-```
-                       [ Internet ]
-                            │
-                            ▼
-              [ Application Load Balancer ]
-                ┌───────────┴───────────┐
-                ▼                       ▼
-    [ Service: Streamlit ]    [ Service: FastAPI ]
-    (Fargate Task Frontend)   (Fargate Task Backend)
-                │                       │
-                └───────────┬───────────┘
-                            ▼
-                     [ Amazon ECS ]
-```
+![Arquitetura de Nuvem AWS](aws_architecture.png)
+
 
 * **VPC & Rede:** Subnets públicas e privadas com suporte a rotas e gateways NAT.
 * **Application Load Balancer (ALB):** Distribui o tráfego HTTP público direcionando-o para a interface Streamlit (porta 8501) ou a API FastAPI (porta 8888).
@@ -569,16 +506,7 @@ py -3.11 -m venv .venv
 python -m pytest -q
 ```
 
-## 17. Proximos Passos Recomendados
-
-1. recalibrar o threshold produtivo do modelo tabular para reduzir falsos positivos;
-2. aumentar populacao e numero de geracoes do AG para melhor exploracao;
-3. adicionar teste automatizado para o endpoint `/analyze-images`;
-4. reforcar o prompt medico para elevar `utilidade_clinica` e padronizacao;
-5. ampliar a avaliacao da LLM com amostra maior e menor dependencia da cota gratuita;
-6. versionar artefatos e experimentos com rastreabilidade por hash e data.
-
-## 18. Status Final
+## 17. Status Final
 
 - AG tabular: concluido
 - AG de imagem: concluido
@@ -588,4 +516,4 @@ python -m pytest -q
 - avaliacao inicial da qualidade da LLM: concluida
 - consolidacao documental em relatorio unico: concluida
 
-Ultima atualizacao: `2026-07-12`
+Ultima atualizacao: `2026-07-14`
