@@ -30,6 +30,32 @@ variable "container_image_frontend" {
 
 variable "gemini_api_key" {
   type        = string
-  description = "Chave de API do Gemini para integração com LLM"
+  description = "Chave de API do Gemini para integração com LLM (opcional se usar Vertex AI)"
   sensitive   = true
+  default     = ""
+}
+
+variable "use_vertex_ai" {
+  type        = bool
+  description = "Ativar o uso do Google Cloud Vertex AI em vez do Gemini Developer API"
+  default     = false
+}
+
+variable "vertex_project" {
+  type        = string
+  description = "ID do Projeto no Google Cloud Platform (GCP)"
+  default     = ""
+}
+
+variable "vertex_location" {
+  type        = string
+  description = "Região/Localização do recurso no Vertex AI"
+  default     = "us-central1"
+}
+
+variable "gcp_service_account_key" {
+  type        = string
+  description = "Conteúdo JSON da chave da Conta de Serviço do GCP para autenticação no Vertex AI"
+  sensitive   = true
+  default     = ""
 }

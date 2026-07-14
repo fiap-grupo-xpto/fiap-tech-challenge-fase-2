@@ -15,10 +15,10 @@ RUN apt-get update \
 WORKDIR /app
 
 COPY requirements.txt ./backend/
-WORKDIR /app/backend
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r ./backend/requirements.txt
 
-COPY ./backend .
+COPY ./backend ./backend
 
 EXPOSE 8888
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8888", "--workers", "1", "--log-level", "trace"]
+ENV PYTHONPATH=/app
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8888", "--workers", "1", "--log-level", "trace"]

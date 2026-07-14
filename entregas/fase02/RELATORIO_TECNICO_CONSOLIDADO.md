@@ -405,7 +405,13 @@ Com isso, a API continua respondendo mesmo sem dependencia obrigatoria da LLM.
 
 Os resultados desta secao foram consolidados a partir de `avaliation/llm_evaluation.ipynb`.
 
-### 11.1 Condicoes da avaliacao
+### 11.1 Propósito e Estrutura do Diretório de Avaliação (`/avaliation`)
+Para atender ao critério de avaliação de qualidade das interpretações geradas pela LLM, estruturamos um ambiente de homologação e auditoria offline localizado na raiz do repositório sob a pasta `/avaliation`:
+* **`llm_evaluation.ipynb`:** Um notebook Jupyter interativo contendo a rotina de testes de qualidade. Ele processa uma amostra do dataset, envia os prompts estruturados à LLM, valida a presença de marcadores e gera relatórios de acerto.
+* **`cached_interpretations.json`:** Um banco de cache das respostas do Gemini, projetado para evitar requisições redundantes à API externa (minimizando erros de rate-limiting) e permitindo que a banca execute o notebook com velocidade e reprodutibilidade, sem depender de uma chave de API ativa.
+* **Aviso de Arquitetura:** Esses componentes atuam puramente como ferramentas de qualidade offline e não têm dependência em tempo de execução no backend ou frontend.
+
+### 11.2 Condicoes da avaliacao
 
 - amostra planejada: `8` casos;
 - interpretacoes efetivamente avaliadas: `3`;
@@ -413,7 +419,7 @@ Os resultados desta secao foram consolidados a partir de `avaliation/llm_evaluat
 - motor avaliado: `gemini-2.5-flash`;
 - criterios qualitativos manuais: `clareza`, `coerencia`, `seguranca_clinica`, `utilidade_clinica`, `padronizacao`.
 
-### 11.2 Conformidade automatica
+### 11.3 Conformidade automatica
 
 - conformidade automatica media: `96.3%`
 - melhor criterio automatico: `tem_secao_resumo` com `100%`
@@ -424,7 +430,7 @@ Leitura:
 - a LLM aderiu bem ao formato exigido e ao padrao estrutural dos prompts;
 - a principal fragilidade automatica identificada foi a presenca inconsistente de disclaimer medico explicito.
 
-### 11.3 Avaliacao qualitativa manual
+### 11.4 Avaliacao qualitativa manual
 
 | Criterio | Media | Desvio padrao | N avaliado |
 |---|---:|---:|---:|

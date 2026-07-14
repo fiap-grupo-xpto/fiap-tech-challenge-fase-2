@@ -30,6 +30,15 @@ def get_client_or_error():
 
     try:
         if use_vertex:
+            gcp_key = os.getenv("GCP_SERVICE_ACCOUNT_KEY")
+            if gcp_key:
+                key_path = "/tmp/gcp_key.json"
+                try:
+                    with open(key_path, "w", encoding="utf-8") as f:
+                        f.write(gcp_key)
+                    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = key_path
+                except Exception:
+                    pass
             project = os.getenv("VERTEX_PROJECT")
             location = os.getenv("VERTEX_LOCATION", "us-central1")
             _client = genai.Client(vertexai=True, project=project, location=location)

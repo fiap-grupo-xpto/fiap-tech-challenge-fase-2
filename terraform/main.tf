@@ -86,6 +86,13 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 8888
+    to_port     = 8888
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -138,7 +145,7 @@ resource "aws_lb" "main" {
 }
 
 resource "aws_lb_target_group" "frontend" {
-  name        = "${var.project_name}-tg-frontend"
+  name        = "tc-f2-tg-frontend"
   port        = 8501
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
@@ -155,7 +162,7 @@ resource "aws_lb_target_group" "frontend" {
 }
 
 resource "aws_lb_target_group" "backend" {
-  name        = "${var.project_name}-tg-backend"
+  name        = "tc-f2-tg-backend"
   port        = 8888
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
@@ -179,6 +186,17 @@ resource "aws_lb_listener" "http_frontend" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.frontend.arn
+  }
+}
+
+resource "aws_lb_listener" "http_backend" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = 8888
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend.arn
   }
 }
 
@@ -214,20 +232,25 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_attachment" {
 }
 
 # Task Definition - Backend (FastAPI)
+resource "aws_cloudwatch_log_group" "backend" {
+  name              = "/ecs/${var.project_name}-backend"
+  retention_in_days = 7
+}
+
 resource "aws_ecs_task_definition" "backend" {
   family                   = "${var.project_name}-backend"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = "1024"
+  memory                   = "2048"
   execution_role_arn       = aws_iam_role.ecs_execution.arn
 
   container_definitions = jsonencode([
     {
       name      = "backend"
       image     = var.container_image_backend
-      cpu       = 256
-      memory    = 512
+      cpu       = 1024
+      memory    = 2048
       essential = true
       portMappings = [
         {
@@ -235,10 +258,34 @@ resource "aws_ecs_task_definition" "backend" {
           hostPort      = 8888
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = "/ecs/${var.project_name}-backend"
+          "awslogs-region"        = var.aws_region
+          "awslogs-stream-prefix" = "backend"
+        }
+      }
       environment = [
         {
           name  = "GEMINI_API_KEY"
           value = var.gemini_api_key
+        },
+        {
+          name  = "USE_VERTEX_AI"
+          value = var.use_vertex_ai ? "true" : "false"
+        },
+        {
+          name  = "VERTEX_PROJECT"
+          value = var.vertex_project
+        },
+        {
+          name  = "VERTEX_LOCATION"
+          value = var.vertex_location
+        },
+        {
+          name  = "GCP_SERVICE_ACCOUNT_KEY"
+          value = var.gcp_service_account_key
         },
         {
           name  = "MAX_LLM_INTERPRETATIONS"
@@ -305,7 +352,7 @@ resource "aws_ecs_service" "backend" {
     container_port   = 8888
   }
 
-  depends_on = [aws_lb_listener.http_frontend]
+  depends_on = [aws_lb_listener.http_frontend, aws_lb_listener.http_backend]
 }
 
 resource "aws_ecs_service" "frontend" {
@@ -327,7 +374,7 @@ resource "aws_ecs_service" "frontend" {
     container_port   = 8501
   }
 
-  depends_on = [aws_lb_listener.http_frontend]
+  depends_on = [aws_lb_listener.http_frontend, aws_lb_listener.http_backend]
 }
 
 # ==========================================

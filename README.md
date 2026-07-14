@@ -1,4 +1,4 @@
-# FIAP - IA PARA DEVS - Tech Challenge Fase 01 - Grupo XPTO (Grupo 69)
+# FIAP - IA PARA DEVS - Tech Challenge Fase 02 - Grupo XPTO (Grupo 69)
 
 # Integrantes do Grupo 69
 
@@ -17,13 +17,8 @@ Este projeto tem o intuito de treinar modelos para análise de risco de cancer d
 
 # Vídeo de demonstração: 
 
-[![(7) FIAP - Grupo 69 - Tech Challenge - Fase 1 - YouTube](https://i.ytimg.com/vi/-SdZHwdxZpI/hqdefault.jpg)](https://www.youtube.com/watch?v=-SdZHwdxZpI "(7) FIAP - Grupo 69 - Tech Challenge - Fase 1 - YouTube")
+[![(7) FIAP - Grupo 69 - Tech Challenge - Fase 2 - YouTube](https://i.ytimg.com/vi/-SdZHwdxZpI/hqdefault.jpg)](https://www.youtube.com/watch?v=-SdZHwdxZpI "(7) FIAP - Grupo 69 - Tech Challenge - Fase 2 - YouTube")
 
-
-# Relatórios PDF (Fase 1)
-
-- [Relatório principal](fiap_tech_challenge_fase_1_analise_cancer_csv_grupo69.pdf)
-- [Relatório extra - visão computacional](fiap_tech_challenge_fase_1_extra_grupo69.pdf)
 
 # Entregáveis da Fase 2
 
@@ -32,7 +27,6 @@ Os documentos canônicos da entrega técnica da Fase 2 foram estruturados e orga
 - [Relatório Técnico Consolidado (Versão PDF)](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/RELATORIO_TECNICO_CONSOLIDADO.pdf) / [Versão Markdown](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/RELATORIO_TECNICO_CONSOLIDADO.md): Consolida a lógica/estrutura do AG, os desafios enfrentados, os comparativos de performance, a integração com LLMs, a infraestrutura em nuvem e a avaliação de qualidade das interpretações.
 - [Guia de Implantação na Nuvem (AWS)](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/COMO_SUBIR_NA_NUVEM.md): Tutorial passo a passo ensinando a buildar e subir as imagens Docker para o ECR, configurar as variáveis e implantar a infraestrutura usando Terraform.
 - [Provisionamento de Nuvem IaC (Terraform)](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/terraform): Diretório contendo os scripts Terraform (`main.tf`, `variables.tf`) para provisionamento automático de arquitetura resiliente na AWS (ECS, Fargate, ALB, VPC).
-- [Roteiro do Vídeo de Demonstração](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/roteiro_video_demonstracao.md): Script e orientações completas em português para gravação do vídeo técnico com até 15 minutos de duração.
 - [Documentação da API Estática](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/API_DOCS.md): Documento contendo a descrição das rotas, parâmetros, exemplos de payloads de sucesso e erro, e comandos curl de teste.
 - [Sumário Técnico da Otimização por AG](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/SUMARIO_TECNICO_GA.md): Detalha a formulação dos hiperparâmetros, operadores de seleção/cruzamento/mutação e a função fitness demográfica.
 - [Resultados Experimentais do AG](file:///Users/otoniel.isidoro/Documents/FIAP/TechChallenge/Tech_Challenge/entregas/fase02/RESULTADOS_GA_OPTIMIZATION.md): Contém o ranking final de fitness e logs consolidados de desempenho tabular por experimento.

@@ -36,8 +36,8 @@ A partir do diretório raiz do projeto, execute o build e o push das imagens rot
 # ==========================================
 # BACKEND (FastAPI)
 # ==========================================
-# 1. Build da imagem
-docker build -f backend/Dockerfile -t tech-challenge-backend:latest .
+# 1. Build da imagem (Importante: use --platform linux/amd64 se estiver no Mac Apple Silicon)
+docker build --platform linux/amd64 -f backend/Dockerfile -t tech-challenge-backend:latest .
 
 # 2. Tag a imagem para o ECR
 docker tag tech-challenge-backend:latest <SUA_CONTA_AWS>.dkr.ecr.<REGIAO>.amazonaws.com/tech-challenge-backend:latest
@@ -48,8 +48,8 @@ docker push <SUA_CONTA_AWS>.dkr.ecr.<REGIAO>.amazonaws.com/tech-challenge-backen
 # ==========================================
 # FRONTEND (Streamlit)
 # ==========================================
-# 1. Build da imagem
-docker build -f frontend/Dockerfile -t tech-challenge-frontend:latest .
+# 1. Build da imagem (Importante: use --platform linux/amd64 se estiver no Mac Apple Silicon)
+docker build --platform linux/amd64 -f frontend/Dockerfile -t tech-challenge-frontend:latest .
 
 # 2. Tag a imagem para o ECR
 docker tag tech-challenge-frontend:latest <SUA_CONTA_AWS>.dkr.ecr.<REGIAO>.amazonaws.com/tech-challenge-frontend:latest
@@ -60,9 +60,10 @@ docker push <SUA_CONTA_AWS>.dkr.ecr.<REGIAO>.amazonaws.com/tech-challenge-fronte
 
 ---
 
-### Passo 3: Configurar Variáveis do Terraform
-Acesse a pasta `/terraform` e crie um arquivo chamado `terraform.tfvars` para passar as variáveis de configuração de forma segura:
+### Passo 3: Configurar Variáveis do Terraform (Opções de LLM)
+As variáveis já estão definidas no arquivo `variables.tf`. Para configurá-las com os seus valores reais de implantação, crie um arquivo chamado `terraform.tfvars` na pasta `/terraform`:
 
+#### Opção A: Se estiver utilizando a Gemini Developer API (com chave)
 ```hcl
 aws_region               = "us-east-1"
 project_name             = "fiap-tech-challenge-fase-2"
@@ -70,6 +71,32 @@ environment              = "production"
 container_image_backend  = "<SUA_CONTA_AWS>.dkr.ecr.<REGIAO>.amazonaws.com/tech-challenge-backend:latest"
 container_image_frontend = "<SUA_CONTA_AWS>.dkr.ecr.<REGIAO>.amazonaws.com/tech-challenge-frontend:latest"
 gemini_api_key           = "SUA_CHAVE_API_GEMINI_AQUI"
+```
+
+#### Opção B: Se estiver utilizando o Google Vertex AI
+Quando a aplicação roda na nuvem AWS Fargate, ela não tem acesso automático ao seu login local (`gcloud auth application-default login`). Para autenticar a aplicação na AWS junto ao GCP, você deve gerar uma chave JSON de Conta de Serviço (Service Account Key) no Console do Google Cloud e configurá-la no `terraform.tfvars`:
+
+```hcl
+aws_region               = "us-east-1"
+project_name             = "fiap-tech-challenge-fase-2"
+environment              = "production"
+container_image_backend  = "<SUA_CONTA_AWS>.dkr.ecr.<REGIAO>.amazonaws.com/tech-challenge-backend:latest"
+container_image_frontend = "<SUA_CONTA_AWS>.dkr.ecr.<REGIAO>.amazonaws.com/tech-challenge-frontend:latest"
+
+use_vertex_ai            = true
+vertex_project           = "ID-DO-SEU-PROJETO-GCP"
+vertex_location          = "us-central1"
+# Copie e cole todo o conteúdo do arquivo JSON da chave da conta de serviço entre aspas:
+gcp_service_account_key  = <<EOF
+{
+  "type": "service_account",
+  "project_id": "...",
+  "private_key_id": "...",
+  "private_key": "...",
+  "client_email": "...",
+  ...
+}
+EOF
 ```
 
 ---

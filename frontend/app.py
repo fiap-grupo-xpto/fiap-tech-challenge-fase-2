@@ -9,7 +9,7 @@ import requests
 import streamlit as st
 
 
-st.set_page_config(layout="wide", page_title="Tech Challenge Fase 01")
+st.set_page_config(layout="wide", page_title="Tech Challenge Fase 02")
 API_URL = os.getenv("API_URL", "http://localhost:8888")
 
 EXPECTED_COLUMNS = [
@@ -72,7 +72,7 @@ def go_to_stage(stage: int) -> None:
     st.rerun()
 
 
-st.title("Tech Challenge Fase 01")
+st.title("Tech Challenge Fase 02")
 st.subheader("FIAP - IA para devs - Grupo 69")
 st.write(
     "O fluxo foi dividido em duas etapas: primeiro a pré-triagem por CSV e, depois, a análise de imagens de ressonância."
