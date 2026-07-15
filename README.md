@@ -15,7 +15,7 @@ Este projeto tem o intuito de treinar modelos para análise de risco de cancer d
 
 # Vídeo de demonstração: 
 
-[![(7) FIAP - Grupo 69 - Tech Challenge - Fase 2 - YouTube](https://i.ytimg.com/vi/-SdZHwdxZpI/hqdefault.jpg)](https://www.youtube.com/watch?v=-SdZHwdxZpI "(7) FIAP - Grupo 69 - Tech Challenge - Fase 2 - YouTube")
+[![(7) FIAP - Grupo 69 - Tech Challenge - Fase 2 - YouTube](https://i.ytimg.com/vi/fYwd5zy4_Wk/hqdefault.jpg)](https://youtu.be/fYwd5zy4_Wk "(7) FIAP - Grupo 69 - Tech Challenge - Fase 2 - YouTube")
 
 
 # Entregáveis da Fase 2
