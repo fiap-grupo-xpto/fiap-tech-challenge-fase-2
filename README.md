@@ -6,8 +6,6 @@ Otoniel da Silva Isidoro - rm368069
 
 André Roberto Figueiró de Magalhães - rm365608
 
-Lucas de Melo Lima - rm373930
-
 Gustavo César de Souza - rm370800
 
 Thales Ernane de Souza - rm372083

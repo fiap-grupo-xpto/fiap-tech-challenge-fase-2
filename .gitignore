@@ -244,3 +244,4 @@ tf_plan
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+**/.history/*

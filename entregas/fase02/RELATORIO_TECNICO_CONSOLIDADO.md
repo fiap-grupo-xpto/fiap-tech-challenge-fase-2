@@ -1,5 +1,17 @@
 # Relatorio Tecnico Consolidado - AG, API, LLM e Avaliacao
 
+**Grupo 69**
+
+- Otoniel da Silva Isidoro - rm368069
+- André Roberto Figueiró de Magalhães - rm365608
+- Gustavo César de Souza - rm370800
+- Thales Ernane de Souza - rm372083
+
+**Link do Vídeo:** [https://youtu.be/fYwd5zy4_Wk](https://youtu.be/fYwd5zy4_Wk)
+
+**Repositório GIT:** https://github.com/fiap-grupo-xpto/fiap-tech-challenge-fase-2
+
+
 ## 1. Escopo da Entrega
 
 Esta entrega cobre cinco frentes integradas:
